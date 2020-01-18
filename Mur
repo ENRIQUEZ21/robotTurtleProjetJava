@@ -1,0 +1,14 @@
+package fctPrincipaleMain;
+
+public class Mur {
+	String typeMur;
+	
+	public Mur(String typeMur)  {
+		typeMur = this.typeMur;
+	}
+	
+	public String getTypeDeMur() {
+		return typeMur;
+	}
+
+}
