@@ -1,0 +1,724 @@
+package fctPrincipaleMain;
+
+import java.awt.Color;
+
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+public class Joueur extends Plateau {
+
+	public ArrayList<Carte> programme = new ArrayList<Carte>();
+	ArrayList<Carte> main = new ArrayList<Carte>();
+	ArrayList<Carte> pileDefausse = new ArrayList<Carte>();
+	ArrayList<Carte> pilePrincipale = new ArrayList<Carte>();
+	ArrayList<Mur> mursGlace = new ArrayList<Mur>();
+	ArrayList<Mur> mursPierre = new ArrayList<Mur>();
+	Scanner scanner = new Scanner(System.in);
+	public String couleurTortue;
+	public char direction;
+	private int[] moveY = new int[] { -1, 0, 1, 0 };
+	private int[] moveX = new int[] { 0, 1, 0, -1 };
+	private Character[] directions = new Character[] { 'N', 'E', 'S', 'O' };
+	public int[] position = new int[2];
+	public ArrayDeque<String> instructions = new ArrayDeque<String>();
+	public boolean partieGagnee = false;
+	public String numeroJoueur;
+	private int nbreJoueurs;
+	public int cpt1;
+	public int cpt2;
+	public int[] cpt = new int[4];
+
+	public Joueur(String couleurTortue, String numeroJoueur) {
+		super();
+
+		couleurTortue = this.couleurTortue;
+		numeroJoueur = this.numeroJoueur;
+	}
+
+	public void play() throws InterruptedException {
+		System.out.println("Tour du joueur num�ro " + getJoueur() + " de couleur " + getCouleur());
+		System.out.println("Quelle action voulez-vous jouer ?\n" + "		1 - Compl�ter le programme\n"
+				+ "		2 - Placer un mur\n" + "		3 - Ex�cuter le programme");
+		while (scanner.hasNextInt() == false) {
+			scanner.nextLine();
+			System.out.println("Veuillez taper un nombre compris entre 1 et 3");
+			scanner.hasNextInt();
+		}
+		int nombreChoisi = scanner.nextInt();
+		while (nombreChoisi != 1 && nombreChoisi != 2 && nombreChoisi != 3) {
+			System.out.println("Quel action voulez-vous jouer " + "(nombre compris entre 1 et 3) ?");
+			while (scanner.hasNextInt() == false) {
+				scanner.nextLine();
+				System.out.println("Veuillez taper un nombre compris entre 1 et 3");
+				scanner.hasNextInt();
+			}
+			nombreChoisi = scanner.nextInt();
+			scanner.nextLine();
+		}
+		if (nombreChoisi == 1) {
+			completerProgramme();
+		} else if (nombreChoisi == 2) {
+			placerMur();
+
+		} else {
+			executerProgramme();
+		}
+		defaussePioche();
+		if (pilePrincipale.size() <= 5) {
+			int length = pileDefausse.size();
+			for (int k = 0; k < length; k++) {
+				pilePrincipale.add(pileDefausse.get(length - k - 1));
+				pileDefausse.remove(length - k - 1);
+			}
+			Collections.shuffle(pilePrincipale);
+		}
+	}
+
+	public void initialisation() {
+		for (int k = 0; k < 18; k++) {
+			pilePrincipale.add(new Carte("bleu", "avancer"));
+		}
+		for (int k = 0; k < 8; k++) {
+			pilePrincipale.add(new Carte("jaune", "tourner � gauche"));
+		}
+		for (int k = 0; k < 8; k++) {
+			pilePrincipale.add(new Carte("violette", "tourner � droite"));
+		}
+		for (int k = 0; k < 3; k++) {
+			pilePrincipale.add(new Carte("laser", "bloquer"));
+		}
+		Collections.shuffle(pilePrincipale);
+		for (int k = 0; k < 5; k++) {
+			main.add(pilePrincipale.get(pilePrincipale.size() - 1));
+			pilePrincipale.remove(pilePrincipale.get(pilePrincipale.size() - 1));
+		}
+		for (int k = 0; k < 3; k++) {
+			mursPierre.add(new Mur("P"));
+		}
+		for (int k = 0; k < 2; k++) {
+			mursGlace.add(new Mur("G"));
+		}
+		setPositionDeDepart();
+	}
+
+	/* GETTER */
+
+	public String getCouleur() {
+		return couleurTortue;
+	}
+
+	public ArrayList<Carte> getProgramme() {
+		return programme;
+	}
+
+	public String getJoueur() {
+		return numeroJoueur;
+	}
+
+	public int[] getPosition() {
+		return position;
+	}
+
+	public String getNom() {
+		return "Joueur " + getJoueur();
+	}
+
+	public ArrayList<Carte> getMain() {
+		return main;
+	}
+
+	public ArrayList<Carte> getPileDefausse() {
+		return pileDefausse;
+	}
+
+	
+
+	public boolean estPartieGagnee() {
+		return partieGagnee;
+	}
+
+	/* SETTER */
+
+	public void setNumeroJoueur(String pNumero) {
+		numeroJoueur = pNumero;
+	}
+
+	public void setCouleurJoueur(String pCouleur) {
+		couleurTortue = pCouleur;
+	}
+
+	public void setPositionDeDepart() {
+		if (nbreJoueurs == 2) {
+			if (couleurTortue.equals("bleue")) {
+				position[0] = 0;
+				position[1] = 1;
+				updatePlateauWithPosition("1");
+			}
+			if (couleurTortue.equals("rouge")) {
+				position[0] = 0;
+				position[1] = 5;
+				updatePlateauWithPosition("2");
+			}
+		} else if (nbreJoueurs == 3) {
+			if (couleurTortue.equals("bleue")) {
+				position[0] = 0;
+				position[1] = 0;
+				updatePlateauWithPosition("1");
+			}
+			if (couleurTortue.equals("rouge")) {
+				position[0] = 0;
+				position[1] = 3;
+				updatePlateauWithPosition("2");
+			}
+			if (couleurTortue.equals("verte")) {
+				position[0] = 0;
+				position[1] = 6;
+				updatePlateauWithPosition("3");
+			}
+		} else {
+			if (couleurTortue.equals("bleue")) {
+				position[0] = 0;
+				position[1] = 0;
+				updatePlateauWithPosition("1");
+			}
+			if (couleurTortue.equals("rouge")) {
+				position[0] = 0;
+				position[1] = 2;
+				updatePlateauWithPosition("2");
+			}
+			if (couleurTortue.equals("verte")) {
+				position[0] = 0;
+				position[1] = 5;
+				updatePlateauWithPosition("3");
+			}
+			if (couleurTortue.equals("rose")) {
+				position[0] = 0;
+				position[1] = 7;
+				updatePlateauWithPosition("4");
+			}
+		}
+		direction = 'S';
+	}
+
+	public void setNombreDeJoueurs(int nbreJoueurs) {
+		this.nbreJoueurs = nbreJoueurs;
+	}
+
+	public void completerProgramme() {
+		if (main.size() == 0) {
+			System.out.println("Vous ne pouvez pas compl�ter le programme car votre main est vide.");
+		} else {
+			int lengthMain = main.size();
+			int cptMain = 0;
+			System.out.println("Votre main est : ");
+			for (int k = 0; k < lengthMain; k++) {
+				System.out.println("Carte de couleur : " + main.get(k).getCouleur() + " et d'instruction : "
+						+ main.get(k).getInstruction());
+			}
+			for (int k = 0; k < lengthMain; k++) {
+				if (k == 0) {
+					System.out.println("Voulez-vous ajouter la premi�re carte � votre programme ?");
+				} else {
+					int x = k + 1;
+					System.out.println("Voulez-vous ajouter la " + x + "�me carte" + " � votre programme ?");
+				}
+
+				String reponse = scanner.nextLine();
+				while (reponse.equals("OUI") == false && reponse.equals("oui") == false
+						&& reponse.equals("Oui") == false && reponse.equals("NON") == false
+						&& reponse.equals("non") == false && reponse.equals("Non") == false) {
+					System.out.println("Voulez-vous l'ajouter � votre programme ?");
+					reponse = scanner.nextLine();
+				}
+				if (reponse.equals("OUI") || reponse.equals("oui") || reponse.equals("Oui")) {
+					programme.add(main.get(k - cptMain));
+					instructions.add(programme.get(programme.size() - 1).getInstruction());
+					main.remove(k - cptMain);
+					cptMain++;
+				}
+			}
+		}
+	}
+
+	private void executerProgramme() throws InterruptedException {
+		while (instructions.size() > 0) {
+			programme.remove(programme.get(instructions.size() - 1));
+			String instruction = instructions.pollFirst();
+			int indexDirection = Arrays.asList(directions).indexOf(direction);
+			System.out.println("Playing Move " + instruction);
+			Thread.sleep(500);
+			if (instruction.equals("tourner � gauche")) {
+				updateDirection(indexDirection - 1);
+			} else if (instruction.equals("tourner � droite")) {
+				updateDirection(indexDirection + 1);
+			} else if (instruction.equals("avancer")) {
+				int[] newPosition = new int[2];
+				newPosition[0] = position[0] + moveY[indexDirection];
+				newPosition[1] = position[1] + moveX[indexDirection];
+				if (isValidPosition(newPosition)) {
+					if (plateau[newPosition[0]][newPosition[1]].equals("G")
+							|| plateau[newPosition[0]][newPosition[1]].equals("P")) {
+						updateDirection(indexDirection + 2);
+					} else if (plateau[newPosition[0]][newPosition[1]].equals("1")) {
+						plateau[newPosition[0]][newPosition[1]] = " ";
+						joueur1.setPositionDeDepart();
+						plateau[position[0]][position[1]] = " ";
+						setPositionDeDepart();
+					} else if (plateau[newPosition[0]][newPosition[1]].equals("2")) {
+						plateau[newPosition[0]][newPosition[1]] = " ";
+						joueur2.setPositionDeDepart();
+						plateau[position[0]][position[1]] = " ";
+						setPositionDeDepart();
+					} else if (plateau[newPosition[0]][newPosition[1]].equals("3")) {
+						plateau[newPosition[0]][newPosition[1]] = " ";
+						joueur3.setPositionDeDepart();
+						plateau[position[0]][position[1]] = " ";
+						setPositionDeDepart();
+					} else if (plateau[newPosition[0]][newPosition[1]].equals("4")) {
+						plateau[newPosition[0]][newPosition[1]] = " ";
+						joueur4.setPositionDeDepart();
+						plateau[position[0]][position[1]] = " ";
+						setPositionDeDepart();
+					} else if (plateau[newPosition[0]][newPosition[1]].equals("JBleu")
+							|| plateau[newPosition[0]][newPosition[1]].equals("JRouge")
+							|| plateau[newPosition[0]][newPosition[1]].equals("JVert")
+							|| plateau[newPosition[0]][newPosition[1]].equals("JRose")) {
+						partieGagnee = true;
+					} else {
+						updatePosition(indexDirection);
+					}
+				} else {
+					updateDirection(indexDirection + 2);
+				}
+
+			}
+			// CARTE LASER :
+			else {
+
+				if (indexDirection == 0) {
+					for (int k = position[0]; k > 8; k--) {
+						if (plateau[k][position[1]].equals("G")) {
+							plateau[k][position[1]] = " ";
+						} else if (plateau[k][position[1]].equals("1") && nbreJoueurs == 2) {
+							joueur1.updateDirection(indexDirection + 2);
+						} else if (plateau[k][position[1]].equals("2") && nbreJoueurs == 2) {
+							joueur2.updateDirection(indexDirection + 2);
+						} else if (plateau[k][position[1]].equals("1") && nbreJoueurs != 2) {
+							plateau[k][position[1]] = " ";
+							joueur1.setPositionDeDepart();
+						} else if (plateau[k][position[1]].equals("2") && nbreJoueurs != 2) {
+							plateau[k][position[1]] = " ";
+							joueur2.setPositionDeDepart();
+						} else if (plateau[k][position[1]].equals("3")) {
+							plateau[k][position[1]] = " ";
+							joueur3.setPositionDeDepart();
+						} else if (plateau[k][position[1]].equals("4")) {
+							plateau[k][position[1]] = " ";
+							joueur4.setPositionDeDepart();
+						}
+						if (plateau[k][position[1]].equals("JBleu") || plateau[k][position[1]].equals("JRouge")
+								|| plateau[k][position[1]].equals("JVert") || plateau[k][position[1]].equals("JRose")) {
+							if (nbreJoueurs == 2) {
+								updateDirection(indexDirection + 2);
+							} else {
+								plateau[k][position[1]] = " ";
+								setPositionDeDepart();
+							}
+						}
+					}
+				} else if (indexDirection == 1) {
+					for (int k = position[1]; k < 8; k++) {
+						if (plateau[position[0]][k] == "G") {
+							plateau[position[0]][k] = " ";
+						} else if (plateau[position[0]][k] == "1" && nbreJoueurs == 2) {
+							joueur1.updateDirection(indexDirection + 2);
+						} else if (plateau[k][position[1]] == "2" && nbreJoueurs == 2) {
+							joueur2.updateDirection(indexDirection + 2);
+						} else if (plateau[position[0]][k] == "1" && nbreJoueurs != 2) {
+							joueur1.setPositionDeDepart();
+							plateau[position[0]][k] = " ";
+						} else if (plateau[position[0]][k] == "2" && nbreJoueurs != 2) {
+							plateau[position[0]][k] = " ";
+							joueur2.setPositionDeDepart();
+						} else if (plateau[position[0]][k] == "3") {
+							plateau[position[0]][k] = " ";
+							joueur3.setPositionDeDepart();
+						} else if (plateau[position[0]][k] == "4") {
+							plateau[position[0]][k] = " ";
+							joueur4.setPositionDeDepart();
+						}
+						if (plateau[position[0]][k].equals("JBleu") || plateau[position[0]][k].equals("JVert")
+								|| plateau[position[0]][k].equals("JRouge")
+								|| plateau[position[0]][k].equals("JRose")) {
+							if (nbreJoueurs == 2) {
+								updateDirection(indexDirection + 2);
+							} else {
+								plateau[position[0]][k] = " ";
+								setPositionDeDepart();
+							}
+
+						}
+					}
+				} else if (indexDirection == 2) {
+					for (int k = position[0]; k < 8; k++) {
+						if (plateau[k][position[1]] == "G") {
+							plateau[k][position[1]] = " ";
+						} else if (plateau[k][position[1]].equals("1") && nbreJoueurs == 2) {
+							joueur1.updateDirection(indexDirection + 2);
+						} else if (plateau[k][position[1]].equals("2") && nbreJoueurs == 2) {
+							joueur2.updateDirection(indexDirection + 2);
+						} else if (plateau[k][position[1]].equals("1") && nbreJoueurs != 2) {
+							plateau[k][position[1]] = " ";
+							joueur1.setPositionDeDepart();
+						} else if (plateau[k][position[1]].equals("2") && nbreJoueurs != 2) {
+							plateau[k][position[1]] = " ";
+							joueur2.setPositionDeDepart();
+						} else if (plateau[k][position[1]].equals("3")) {
+							plateau[k][position[1]] = " ";
+							joueur3.setPositionDeDepart();
+						} else if (plateau[k][position[1]].equals("4")) {
+							plateau[k][position[1]] = " ";
+							joueur4.setPositionDeDepart();
+						}
+						if (plateau[k][position[1]] == "JBleu" || plateau[k][position[1]] == "JVert"
+								|| plateau[k][position[1]] == "JRouge" || plateau[k][position[1]] == "JRose") {
+							if (nbreJoueurs == 2) {
+								updateDirection(indexDirection + 2);
+							} else {
+								setPositionDeDepart();
+								plateau[k][position[1]] = " ";
+							}
+						}
+					}
+
+				} else {
+					for (int k = position[1]; k > 0; k--) {
+						if (plateau[position[0]][k] == "G") {
+							plateau[position[0]][k] = " ";
+						} else if (plateau[position[0]][k] == "1" && nbreJoueurs == 2) {
+							joueur1.updateDirection(indexDirection + 2);
+						} else if (plateau[k][position[1]] == "2" && nbreJoueurs == 2) {
+							joueur2.updateDirection(indexDirection + 2);
+						} else if (plateau[position[0]][k] == "1" && nbreJoueurs == 2) {
+							joueur1.setPositionDeDepart();
+							plateau[position[0]][k] = " ";
+						} else if (plateau[position[0]][k] == "2" && nbreJoueurs == 2) {
+							joueur2.setPositionDeDepart();
+							plateau[position[0]][k] = " ";
+						} else if (plateau[position[0]][k] == "3") {
+							joueur3.setPositionDeDepart();
+							plateau[position[0]][k] = " ";
+						} else if (plateau[position[0]][k] == "4") {
+							joueur4.setPositionDeDepart();
+							plateau[position[0]][k] = " ";
+						}
+						if (plateau[position[0]][k] == "JBleu" || plateau[position[0]][k] == "JVert"
+								|| plateau[position[0]][k] == "JRouge" || plateau[position[0]][k] == "JRose") {
+							if (nbreJoueurs == 2) {
+								updateDirection(indexDirection + 2);
+							} else {
+								setPositionDeDepart();
+								plateau[position[0]][k] = " ";
+							}
+
+						}
+					}
+				}
+			}
+			// FIN DE LA CARTE LASER
+			updatePlateauWithPosition(numeroJoueur);
+			displayTableau();
+		}
+
+	}
+
+	private void updateDirection(int newIndexDirection) {
+		int validIndex = (newIndexDirection + 4) % 4;
+		direction = directions[validIndex];
+		Plateau.rafraichirPlateau();
+	}
+
+	private void updatePosition(int indexDirection) {
+		int[] newPosition = new int[2];
+		plateau[position[0]][position[1]] = " ";
+		newPosition[0] = position[0] + moveY[indexDirection];
+		newPosition[1] = position[1] + moveX[indexDirection];
+		if (isValidPosition(newPosition)) {
+			position = newPosition;
+		} else {
+			System.out.println("/!\\ This is an Invalid Move !");
+		}
+	}
+
+	private boolean isValidPosition(int[] newPosition) {
+		return newPosition[0] >= 0 && newPosition[0] < plateau.length && newPosition[1] >= 0
+				&& newPosition[1] < plateau[0].length;
+	}
+
+	private void updatePlateauWithPosition(String numeroJoueur) {
+		viderTableau();
+		plateau[position[0]][position[1]] = numeroJoueur;
+	}
+
+	private static void viderTableau() {
+		for (int i = 0; i < plateau.length; i++) {
+			for (int j = 0; j < plateau[0].length; j++) {
+				if (plateau[i][j] == null) {
+					plateau[i][j] = " ";
+				}
+
+			}
+		}
+		Plateau.rafraichirPlateau();
+	}
+
+	public void displayTableau() {
+		// TODO Auto-generated method stub
+		for (int i = 0; i < plateau.length; i++) {
+			System.out.print("|");
+			for (int j = 0; j < plateau[i].length; j++) {
+				System.out.print(plateau[i][j]);
+			}
+			System.out.println("|");
+		}
+		System.out.println("Position x=" + position[1] + " y =" + position[0] + "\n direction :" + direction);
+
+	}
+
+	public void placerMur() {
+		if (mursPierre.size() > 0 && mursGlace.size() > 0) {
+			System.out.println(
+					"Quel type de mur souhaitez-vous ajouter ?\n" + "G - mur de glace\n" + "P - mur de pierre");
+			String typeMur = scanner.nextLine();
+			while (typeMur.equals("G") == false && typeMur.equals("P") == false) {
+				System.out.println("Quel type de mur souhaitez-vous ajouter(P/G) ?");
+				typeMur = scanner.nextLine();
+			}
+			System.out.println("Quelle est l'ordonn�e o� vous souhaitez placer " + "votre mur ?");
+			System.out.println("Ordonn�e(=num de ligne) : ");
+			while (scanner.hasNextInt() == false) {
+				scanner.nextLine();
+				System.out.println("Veuillez choisir un nombre compris entre 0 et 7");
+				scanner.hasNextInt();
+			}
+			int ordMur = scanner.nextInt();
+			scanner.nextLine();
+			System.out.println("Quelle est l'abscisse o� vous souhaitez placer " + "votre mur ?");
+			System.out.println("Abscisse(=num de colonne) : ");
+			while (scanner.hasNextInt() == false) {
+				scanner.nextLine();
+				System.out.println("Veuillez choisir un nombre compris entre 0 et 7");
+				scanner.hasNextInt();
+			}
+			int absMur = scanner.nextInt();
+			scanner.nextLine();
+			int[] nPosition = new int[4];
+			nPosition[0] = ordMur;
+			nPosition[1] = absMur;
+			while (isValidPosition(nPosition) == false || plateau[ordMur][absMur] != " " || vaBloquer(ordMur, absMur)) {
+				cpt1 = 0;
+				cpt2 = 0;
+				for (int k = 0; k < 4; k++) {
+					cpt[k] = 0;
+				}
+				System.out.println("Veuillez donnez une ordonn�e comprise entre 0 et 7");
+				System.out.println(
+						"La case que vous souhaitez occuper ne doit pas �tre d�j� utilis�e.\\nVeillez aussi � ne pas bloquer un joyau ou un joueur");
+				ordMur = scanner.nextInt();
+				scanner.nextLine();
+				System.out.println("Veuillez donnez une abscisse comprise entre 0 et 7");
+				System.out.println(
+						"La case que vous souhaitez occuper ne doit pas �tre d�j� utilis�e.\\nVeillez aussi � ne pas bloquer un joyau ou un joueur");
+				absMur = scanner.nextInt();
+				scanner.nextLine();
+			}
+			if (typeMur.equals("G")) {
+				// On place le mur
+				plateau[ordMur][absMur] = "G";
+				mursGlace.remove(mursGlace.size() - 1);
+
+			}
+
+			if (typeMur.equals("P")) {
+				plateau[ordMur][absMur] = "P";
+				mursPierre.remove(mursPierre.size() - 1);
+			}
+		} else if (mursGlace.size() == 0 && mursPierre.size() > 0) {
+			System.out.println("Il ne reste plus de murs de glace, donc vous ne pouvez placer que des murs de pierre.");
+			System.out.println("Quelle est l'ordonn�e o� vous souhaitez placer " + "votre mur de pierre?");
+			System.out.println("Ordonn�e(=num de ligne) : ");
+			while (scanner.hasNextInt() == false) {
+				scanner.nextLine();
+				System.out.println("Veuillez choisir un nombre compris entre 0 et 7");
+				scanner.hasNextInt();
+			}
+			int ordMur = scanner.nextInt();
+			scanner.nextLine();
+			System.out.println("Quelle est l'abscisse o� vous souhaitez placer " + "votre mur de pierre?");
+			System.out.println("Abscisse(=num de colonne) : ");
+			while (scanner.hasNextInt() == false) {
+				scanner.nextLine();
+				System.out.println("Veuillez choisir un nombre compris entre 0 et 7");
+				scanner.hasNextInt();
+			}
+			int absMur = scanner.nextInt();
+			scanner.nextLine();
+			int[] nPosition = new int[4];
+			nPosition[0] = ordMur;
+			nPosition[1] = absMur;
+			while (isValidPosition(nPosition) == false || plateau[ordMur][absMur] != " " || vaBloquer(ordMur, absMur)) {
+				cpt1 = 0;
+				cpt2 = 0;
+				for (int k = 0; k < 4; k++) {
+					cpt[k] = 0;
+				}
+				System.out.println("Veuillez donnez une ordonn�e comprise entre 0 et 7");
+				System.out.println(
+						"La case que vous souhaitez occuper ne doit pas �tre d�j� utilis�e.\nVeillez aussi � ne pas bloquer un joyau ou un joueur");
+				ordMur = scanner.nextInt();
+				scanner.nextLine();
+				System.out.println("Veuillez donnez une abscisse comprise entre 0 et 7");
+				System.out.println(
+						"La case que vous souhaitez occuper ne doit pas �tre d�j� utilis�e.\nVeillez aussi � ne pas bloquer un joyau ou un joueur");
+				absMur = scanner.nextInt();
+				scanner.nextLine();
+			}
+			plateau[ordMur][absMur] = "P";
+			mursPierre.remove(mursPierre.size() - 1);
+		} else if (mursGlace.size() > 0 && mursPierre.size() == 0) {
+			System.out.println("Il ne reste plus de murs de pierre, donc vous ne pouvez placer que des murs de glace.");
+			System.out.println("Quelle est l'ordonn�e o� vous souhaitez placer " + "votre mur de glace ?");
+			System.out.println("Ordonn�e(=num de ligne) : ");
+			while (scanner.hasNextInt() == false) {
+				scanner.nextLine();
+				System.out.println("Veuillez choisir un nombre compris entre 0 et 7");
+				scanner.hasNextInt();
+			}
+			int ordMur = scanner.nextInt();
+			scanner.nextLine();
+			System.out.println("Quelle est l'abscisse o� vous souhaitez placer " + "votre mur de glace?");
+			System.out.println("Abscisse(=num de colonne) : ");
+			while (scanner.hasNextInt() == false) {
+				scanner.nextLine();
+				System.out.println("Veuillez choisir un nombre compris entre 0 et 7");
+				scanner.hasNextInt();
+			}
+			int absMur = scanner.nextInt();
+			scanner.nextLine();
+			int[] nPosition = new int[4];
+			nPosition[0] = ordMur;
+			nPosition[1] = absMur;
+			while (isValidPosition(nPosition) == false || plateau[ordMur][absMur] != " " || vaBloquer(ordMur, absMur)) {
+				cpt1 = 0;
+				cpt2 = 0;
+				for (int k = 0; k < 4; k++) {
+					cpt[k] = 0;
+				}
+				System.out.println("Veuillez donnez une ordonn�e comprise entre 0 et 7");
+				System.out.println(
+						"La case que vous souhaitez occuper ne doit pas �tre d�j� utilis�e./nVeillez aussi � ne pas bloquer un joyau ou un joueur");
+				ordMur = scanner.nextInt();
+				scanner.nextLine();
+				System.out.println("Veuillez donnez une abscisse comprise entre 0 et 7");
+				System.out.println(
+						"La case que vous souhaitez occuper ne doit pas �tre d�j� utilis�e.\nVeillez aussi � ne pas bloquer un joyau ou un joueur");
+				absMur = scanner.nextInt();
+				scanner.nextLine();
+			}
+			plateau[ordMur][absMur] = "G";
+			mursGlace.remove(mursGlace.size() - 1);
+		} else {
+			System.out.println("Il ne reste plus de murs de glace ni de pierre.");
+		}
+
+	}
+
+	public boolean vaBloquer(int abs, int ord) {
+		for (int k = 0; k < 4; k++) {
+			int[] newPosition = new int[2];
+			newPosition[0] = abs + moveY[k];
+			newPosition[1] = ord + moveX[k];
+			if (isValidPosition(newPosition)) {
+				if (plateau[newPosition[0]][newPosition[1]].equals("1")
+						|| plateau[newPosition[0]][newPosition[1]].equals("2")
+						|| plateau[newPosition[0]][newPosition[1]].equals("3")
+						|| plateau[newPosition[0]][newPosition[1]].equals("4")
+						|| plateau[newPosition[0]][newPosition[1]].equals("JBleu")
+						|| plateau[newPosition[0]][newPosition[1]].equals("JVert")
+						|| plateau[newPosition[0]][newPosition[1]].equals("JRose")
+						|| plateau[newPosition[0]][newPosition[1]].equals("JRouge")) {
+					cpt1++;
+					for (int j = 0; j < 4; j++) {
+						int[] newPosition1 = new int[2];
+						newPosition1[0] = newPosition[0] + moveY[j];
+						newPosition1[1] = newPosition[1] + moveX[j];
+						if (isValidPosition(newPosition1)) {
+							if (plateau[newPosition1[0]][newPosition1[1]].equals(" ")) {
+								cpt[k]++;
+							}
+						}
+					}
+				}
+			}
+		}
+		for (int k = 0; k < 4; k++) {
+			if (cpt[k] != 0) {
+				cpt2++;
+			}
+		}
+		if (cpt1 == cpt2) {
+			return false;
+		} else {
+			return true;
+		}
+
+	}
+
+	public void defaussePioche() {
+		System.out.println("Voulez-vous d�fausser votre main et piocher des cartes ?");
+		String reponse = scanner.nextLine();
+		while (reponse.equals("OUI") == false && reponse.equals("oui") == false && reponse.equals("Oui") == false
+				&& reponse.equals("NON") == false && reponse.equals("non") == false && reponse.equals("Non") == false) {
+			System.out.println("Voulez-vous d�fausser votre main et piocher des cartes(oui/non) ?");
+			reponse = scanner.nextLine();
+		}
+		if (reponse.equals("OUI") || reponse.equals("oui") || reponse.equals("Oui")) {
+			int lengthMain = main.size();
+			if (lengthMain > 0) {
+				for (int k = 0; k < lengthMain; k++) {
+					pileDefausse.add(main.get(lengthMain - k - 1));
+					main.remove(lengthMain - k - 1);
+				}
+			}
+			for (int k = 0; k < 5; k++) {
+				main.add(pilePrincipale.get(pilePrincipale.size() - 1));
+				pilePrincipale.remove(pilePrincipale.get(pilePrincipale.size() - 1));
+			}
+		} else {
+
+		}
+
+	}
+
+}
