@@ -1,0 +1,185 @@
+package fctPrincipaleMain;
+
+import java.util.Scanner;
+
+// Cette classe va g�rer les interactions entre les tortues
+public class Plateau extends Principale {
+	Scanner scanner = new Scanner(System.in);
+	private int cpt = 0;
+	static Partie partie = new Partie();
+	public int nbreJoueurs;
+
+	public Plateau() {
+		super();
+	}
+
+	public void lancerJeu() throws InterruptedException {
+		System.out.println("Quel est le nombre de joueurs qui souhaitent jouer au jeu ?");
+		while(scanner.hasNextInt()==false) {
+			scanner.nextLine();
+			System.out.println("Veuillez taper un nombre compris entre 2 et 4");
+			scanner.hasNextInt();
+		}
+		nbreJoueurs = scanner.nextInt();
+		scanner.nextLine();
+		while(nbreJoueurs!=2 && nbreJoueurs!=3 && nbreJoueurs!=4) {
+			System.out.println("Veuillez choisir un nombre compris entre 2 et 4");		
+			while(scanner.hasNextInt()==false) {
+				scanner.nextLine();
+				System.out.println("Veuillez taper un nombre compris entre 2 et 4");
+				scanner.hasNextInt();
+			}
+			nbreJoueurs = scanner.nextInt();
+			scanner.nextLine();
+		}
+		positionImages.afficherFenetre();	
+		if (nbreJoueurs==2) {
+			partie.setJoyauxPlateau2();
+			partie.setMursPierrePlateau();
+			joueur1.setNumeroJoueur("1");
+			joueur1.setCouleurJoueur("bleue");
+			joueur1.initialisation();
+			joueur2.setNombreDeJoueurs(2);
+			joueur2.setNumeroJoueur("2");
+			joueur2.setCouleurJoueur("rouge");
+			joueur2.initialisation();
+			while (joueur1.estPartieGagnee() == false && joueur2.estPartieGagnee() == false) {
+				if (cpt % 2 == 1) {
+					joueur2.play();
+					cpt++;
+				} else {
+					joueur1.play();
+					cpt++;
+				}
+			}
+			if (joueur1.estPartieGagnee() == true) {
+				System.out.println("Le joueur bleu a gagn�");
+			} else if (joueur2.estPartieGagnee() == true) {
+				System.out.println("Le joueur rouge a gagn�");
+			}
+		
+	}else if(nbreJoueurs==3)
+
+	{
+		positionImages.afficherFenetre();
+		partie.setJoyauxPlateau3();
+		partie.setMursPierrePlateau();
+		joueur1.setNombreDeJoueurs(3);
+		joueur1.setNumeroJoueur("1");
+		joueur1.setCouleurJoueur("bleue");
+		joueur1.initialisation();
+		joueur2.setNombreDeJoueurs(3);
+		joueur2.setNumeroJoueur("2");
+		joueur2.setCouleurJoueur("rouge");
+		joueur2.initialisation();
+		joueur3.setNombreDeJoueurs(3);
+		joueur3.setNumeroJoueur("3");
+		joueur3.setCouleurJoueur("verte");
+		joueur3.initialisation();
+		while ((joueur1.estPartieGagnee() == false && joueur2.estPartieGagnee() == false)
+				|| (joueur1.estPartieGagnee() == false && joueur3.estPartieGagnee() == false)
+				|| (joueur2.estPartieGagnee() == false && joueur3.estPartieGagnee() == false)
+				|| (joueur1.estPartieGagnee() == false && joueur2.estPartieGagnee() == false
+						&& joueur3.estPartieGagnee() == false)) {
+			if (joueur1.estPartieGagnee() == false) {
+				joueur1.play();
+			} else if (joueur1.estPartieGagnee() == true) {
+				System.out.println("Le joueur bleu a gagn�. Il ne joue plus.");
+			}
+			if (joueur2.estPartieGagnee() == false) {
+				joueur2.play();
+			} else if (joueur2.estPartieGagnee() == true) {
+				System.out.println("Le joueur rouge a gagn�. Il ne joue plus.");
+			}
+			if (joueur3.estPartieGagnee() == false) {
+				joueur3.play();
+			} else if (joueur3.estPartieGagnee() == true) {
+				System.out.println("Le joueur vert a gagn�. Il ne joue plus.");
+			}
+		}
+		if (joueur1.estPartieGagnee() == false) {
+			System.out.println("Les joueurs rouge et vert ont gagn� la partie. Le joueur bleu a perdu.");
+		}
+		if (joueur2.estPartieGagnee() == false) {
+			System.out.println("Les joueurs bleu et vert ont gagn� la partie. Le joueur rouge a perdu.");
+		}
+		if (joueur3.estPartieGagnee() == false) {
+			System.out.println("Les joueurs bleu et rouge ont gagn� la partie. Le joueur vert a perdu.");
+		}
+	}else
+	{
+		positionImages.afficherFenetre();
+		partie.setJoyauxPlateau4();
+		joueur1.setNombreDeJoueurs(4);
+		joueur1.setNumeroJoueur("1");
+		joueur1.setCouleurJoueur("bleue");
+		joueur1.initialisation();
+		joueur2.setNombreDeJoueurs(4);
+		joueur2.setNumeroJoueur("2");
+		joueur2.setCouleurJoueur("rouge");
+		joueur2.initialisation();
+		joueur3.setNombreDeJoueurs(4);
+		joueur3.setNumeroJoueur("3");
+		joueur3.setCouleurJoueur("verte");
+		joueur3.initialisation();
+		joueur4.setNombreDeJoueurs(4);
+		joueur4.setNumeroJoueur("4");
+		joueur4.setCouleurJoueur("rose");
+		joueur4.initialisation();
+		while ((joueur1.estPartieGagnee() == false && joueur2.estPartieGagnee() == false)
+				|| (joueur1.estPartieGagnee() == false && joueur3.estPartieGagnee() == false)
+				|| (joueur1.estPartieGagnee() == false && joueur4.estPartieGagnee() == false)
+				|| (joueur2.estPartieGagnee() == false && joueur3.estPartieGagnee() == false)
+				|| (joueur2.estPartieGagnee() == false && joueur4.estPartieGagnee() == false)
+				|| (joueur3.estPartieGagnee() == false && joueur4.estPartieGagnee() == false)
+				|| (joueur1.estPartieGagnee() == false && joueur2.estPartieGagnee() == false
+						&& joueur3.estPartieGagnee() == false)
+				|| (joueur1.estPartieGagnee() == false && joueur2.estPartieGagnee() == false
+						&& joueur4.estPartieGagnee() == false)
+				|| (joueur1.estPartieGagnee() == false && joueur3.estPartieGagnee() == false
+						&& joueur4.estPartieGagnee() == false)
+				|| (joueur2.estPartieGagnee() == false && joueur3.estPartieGagnee() == false
+						&& joueur4.estPartieGagnee() == false)
+				|| (joueur1.estPartieGagnee() == false && joueur2.estPartieGagnee() == false
+						&& joueur3.estPartieGagnee() == false && joueur4.estPartieGagnee() == false)) {
+			if (joueur1.estPartieGagnee() == false) {
+				joueur1.play();
+			} else if (joueur1.estPartieGagnee() == true) {
+				System.out.println("Le joueur bleu a gagn�. Il ne joue plus.");
+			}
+			if (joueur2.estPartieGagnee() == false) {
+				joueur2.play();
+			} else if (joueur2.estPartieGagnee() == true) {
+				System.out.println("Le joueur rouge a gagn�. Il ne joue plus.");
+			}
+			if (joueur3.estPartieGagnee() == false) {
+				joueur3.play();
+			} else if (joueur3.estPartieGagnee() == true) {
+				System.out.println("Le joueur vert a gagn�. Il ne joue plus.");
+			}
+			if (joueur4.estPartieGagnee() == false) {
+				joueur4.play();
+			} else if (joueur4.estPartieGagnee() == true) {
+				System.out.println("Le joueur rose a gagn�. Il ne joue plus.");
+			}
+		}
+		if (joueur1.estPartieGagnee() == false) {
+			System.out.println("Les joueurs bleu, rouge et vert ont gagn� la partie. Le joueur rose a perdu.");
+		}
+		if (joueur2.estPartieGagnee() == false) {
+			System.out.println("Les joueurs bleu, vert et rose ont gagn� la partie. Le joueur rouge a perdu.");
+		}
+		if (joueur3.estPartieGagnee() == false) {
+			System.out.println("Les joueurs bleu, rouge et rose ont gagn� la partie. Le joueur vert a perdu.");
+		}
+		if (joueur4.estPartieGagnee() == false) {
+			System.out.println("Les joueurs bleu, rouge et vert ont gagn� la partie. Le joueur rose a perdu.");
+		}
+	}
+	}
+
+	public static void rafraichirPlateau() {
+		positionImages.rafraichirAffichage();
+	}
+
+}
