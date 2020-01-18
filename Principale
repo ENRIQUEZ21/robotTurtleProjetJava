@@ -1,0 +1,63 @@
+package fctPrincipaleMain;
+
+
+import javax.swing.JFrame;
+
+
+
+
+
+
+
+
+/*
+ * Les r�gles du jeu sont : A chaque tour, les joueurs ont 3 choix : 1)Compl�ter
+ * le programme avec des cartes de leur main, puis apr�s, ils peuvent d�fausser
+ * le reste de leurs cartes et doivent piocher des cartes dans la pile
+ * principale jusqu'� en avoir 5 dans leur main, ils mettent les cartes
+ * d�fauss�es dans la pile de d�fausse, qui deviendra la pile Principale
+ * lorsqu'il n'y aura plus de carte � utiliser 2) Executer le programme, puis
+ * d�fausse et pioche, apr�s l'�x�cution du programme, ses cartes sont ajout�es
+ * � la pile de d�fausse 3) Construire un mur pour bloquer des joueurs adverses
+ */
+
+public class Principale extends JFrame {
+	public static String[][] plateau = new String[8][8];
+	static Joueur joueur1 = new Joueur("bleue", "1");
+	static Joueur joueur2 = new Joueur("rouge", "2");
+	static Joueur joueur3 = new Joueur("verte", "3");
+	static Joueur joueur4 = new Joueur("rose", "4");
+
+	public static PositionImages positionImages = new PositionImages();
+	public Plateau plateauDeJeu;
+	
+	
+
+	public Principale() {
+		super("ROBOT TURTLE");
+		for(int k = 0; k < 8; k ++) {
+			for(int j = 0; j < 8; j ++) {
+				plateau[k][j]=" ";
+			}
+		}
+	}
+		
+
+
+	public static void main(String[] args) throws InterruptedException{
+		// TODO Auto-generated method stub
+		//new Principale().setVisible(true);
+		positionImages.affichagePlateau();
+		Plateau plateau = new Plateau();
+		plateau.lancerJeu();
+
+	}
+
+		
+		
+
+	}
+
+
+	
+
