@@ -1,0 +1,176 @@
+package fctPrincipaleMain;
+
+import java.awt.Color;
+
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+public class PositionImages extends Principale{
+
+	public Image imageDeFond = new ImageIcon("C:/Users/enriq/eclipse-workspace/projetJava/imageD�but/background.jpeg")
+			.getImage();
+	public Image murGlace = new ImageIcon("C:/Users/enriq/eclipse-workspace/projetJava/imageD�but/ICE.png").getImage();
+	public Image murPierre = new ImageIcon("C:/Users/enriq/eclipse-workspace/projetJava/imageD�but/WALL.png").getImage()
+			.getScaledInstance(50, 50, Image.SCALE_DEFAULT);
+	public Image robot1 = new ImageIcon("C:/Users/enriq/eclipse-workspace/projetJava/imageD�but/TortueBleue.jpg")
+			.getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT);
+	public Image robot2 = new ImageIcon("C:/Users/enriq/eclipse-workspace/projetJava/imageD�but/TortueRouge.png")
+			.getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT);
+	public Image robot3 = new ImageIcon("C:/Users/enriq/eclipse-workspace/projetJava/imageD�but/TortueVerte.png")
+			.getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT);
+	public Image robot4 = new ImageIcon("C:/Users/enriq/eclipse-workspace/projetJava/imageD�but/TortueRose.png")
+			.getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT);
+	public Image rubis = new ImageIcon("C:/Users/enriq/eclipse-workspace/projetJava/imageD�but/RUBY.png").getImage()
+			.getScaledInstance(50, 50, Image.SCALE_DEFAULT);
+	public Image plateauDeJeu = new ImageIcon("C:/Users/enriq/eclipse-workspace/projetJava/imageD�but/PlateauRobotTurtle.png").getImage()
+			.getScaledInstance(400, 400, Image.SCALE_DEFAULT);
+
+	private JFrame fenetre;
+	private Panneau paneau;
+
+	public PositionImages() {
+		// super();
+
+		fenetre = new JFrame();
+		fenetre.setSize(400, 400);
+		fenetre.setTitle("ROBOT TURTLE");
+		fenetre.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		fenetre.setVisible(true);
+	}
+
+	
+
+	public void affichagePlateau() {
+		paneau = new Panneau();
+		fenetre.add(paneau);
+		paneau.setBackground(Color.WHITE);
+		fenetre.setVisible(true);
+	}
+
+	public void rafraichirAffichage() {
+		paneau.repaint();
+	}
+
+	public void afficherFenetre() {
+		fenetre.setVisible(true);
+	}
+
+
+	class Panneau extends JPanel {
+		public static final int x = 30, y = 20, h = 50;
+
+		/*** A savoir, en java, les rotations se font selon le sens horaire ***/
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			g.drawImage(plateauDeJeu, 30, 20, 400, 400, this);
+			/*g.drawLine(x, y, x + 8 * h, y);
+			g.drawLine(x + 8 * h, y, x + 8 * h, y + 8 * h);
+			g.drawLine(x + 8 * h, y + 8 * h, x, y + 8 * h);
+			g.drawLine(x, y + 8 * h, x, y);
+			// cases
+			for (int k = 1; k < 8; k++) {
+				g.drawLine(x + k * h, y, x + k * h, y + 8 * h);
+				g.drawLine(x, y + k * h, x + 8 * h, y + k * h);
+			}*/
+			for (int k = 0; k < 8; k++) {
+				for (int i = 0; i < 8; i++) {
+					if (plateau[k][i].equals("P")) {
+						g.drawImage(murPierre, x + i * h, y + k * h, 50, 50, this);
+					}
+					if (plateau[k][i].equals("G")) {
+						g.drawImage(murGlace, x + i * h, y + k * h, 50, 50, this);
+					}
+					if (plateau[k][i].equals("1")) {
+						if (joueur1.direction == 'S') {
+							rotateImage(g, robot1, x + i * h, y + k * h, -90);
+							g.drawRect(x + i * h, y + k * h, robot1.getWidth(this), robot1.getHeight(this));
+						} else if (joueur1.direction == 'E') {
+							rotateImage(g, robot1, x + i * h, y + k * h, 180);
+							g.drawRect(x + i * h, y + k * h, robot1.getWidth(this), robot1.getHeight(this));
+						} else if (joueur1.direction == 'O') {
+							rotateImage(g, robot1, x + i * h, y + k * h, 0);
+							g.drawRect(x + i * h, y + k * h, robot1.getWidth(this), robot1.getHeight(this));
+						} else if (joueur1.direction == 'N') {
+							rotateImage(g, robot1, x + i * h, y + k * h, 90);
+							g.drawRect(x + i * h, y + k * h, robot1.getWidth(this), robot1.getHeight(this));
+						}
+
+					} else if (plateau[k][i].equals("2")) {
+						if (joueur2.direction == 'S') {
+							rotateImage(g, robot2, x + i * h, y + k * h, -90);
+							g.drawRect(x + i * h, y + k * h, robot2.getWidth(this), robot2.getHeight(this));
+						} else if (joueur2.direction == 'E') {
+							rotateImage(g, robot2, x + i * h, y + k * h, 180);
+							g.drawRect(x + i * h, y + k * h, robot2.getWidth(this), robot2.getHeight(this));
+						} else if (joueur2.direction == 'O') {
+							rotateImage(g, robot2, x + i * h, y + k * h, 0);
+							g.drawRect(x + i * h, y + k * h, robot2.getWidth(this), robot2.getHeight(this));
+						} else if (joueur2.direction == 'N') {
+							rotateImage(g, robot2, x + i * h, y + k * h, 90);
+							g.drawRect(x + i * h, y + k * h, robot2.getWidth(this), robot2.getHeight(this));
+						}
+					} else if (plateau[k][i].equals("3")) {
+						if (joueur3.direction == 'S') {
+							rotateImage(g, robot3, x + i * h, y + k * h, -90);
+							g.drawRect(x + i * h, y + k * h, robot3.getWidth(this), robot3.getHeight(this));
+						} else if (joueur3.direction == 'E') {
+							rotateImage(g, robot3, x + i * h, y + k * h, 180);
+							g.drawRect(x + i * h, y + k * h, robot3.getWidth(this), robot3.getHeight(this));
+						} else if (joueur3.direction == 'O') {
+							rotateImage(g, robot3, x + i * h, y + k * h, 0);
+							g.drawRect(x + i * h, y + k * h, robot3.getWidth(this), robot3.getHeight(this));
+						} else if (joueur3.direction == 'N') {
+							rotateImage(g, robot3, x + i * h, y + k * h, 90);
+							g.drawRect(x + i * h, y + k * h, robot3.getWidth(this), robot3.getHeight(this));
+						}
+					} else if (plateau[k][i].equals("4")) {
+						if (joueur4.direction == 'S') {
+							rotateImage(g, robot4, x + i * h, y + k * h, -90);
+							g.drawRect(x + i * h, y + k * h, robot4.getWidth(this), robot4.getHeight(this));
+						} else if (joueur4.direction == 'E') {
+							rotateImage(g, robot4, x + i * h, y + k * h, 180);
+							g.drawRect(x + i * h, y + k * h, robot4.getWidth(this), robot4.getHeight(this));
+						} else if (joueur4.direction == 'O') {
+							rotateImage(g, robot4, x + i * h, y + k * h, 0);
+							g.drawRect(x + i * h, y + k * h, robot4.getWidth(this), robot4.getHeight(this));
+						} else if (joueur4.direction == 'N') {
+							rotateImage(g, robot4, x + i * h, y + k * h, 90);
+							g.drawRect(x + i * h, y + k * h, robot4.getWidth(this), robot4.getHeight(this));
+						}
+					}
+					if (plateau[k][i].equals("JRose") || plateau[k][i].equals("JBleu") || plateau[k][i].equals("JRouge")
+							|| plateau[k][i].equals("JVert")) {
+						g.drawImage(rubis, x + i * h, y + k * h, 50, 50, this);
+
+					}
+
+				}
+			}
+
+		}
+
+		private void rotateImage(Graphics g, Image image, int x, int y, double angle) {
+
+			Graphics2D g2d = (Graphics2D) g.create();
+			g2d.transform(AffineTransform.getRotateInstance(Math.toRadians(angle), x + image.getWidth(this) / 2,
+					y + image.getHeight(this) / 2));
+			g2d.drawImage(image, x, y, this);
+
+			g2d.dispose();
+		}
+	}
+
+}
