@@ -1,0 +1,45 @@
+package fctPrincipaleMain;
+
+public class Partie extends Plateau {
+	
+
+	public Partie() {
+		super();
+		
+
+	}
+
+	public void setJoyauxPlateau2() {
+			int ordJoyau2 = 7;
+			int absJoyau2 = 3;
+			plateau[ordJoyau2][absJoyau2] = "JVert";
+		} 
+	public void setJoyauxPlateau3() { 
+			int ordJoyau3R = 7;
+			int absJoyau3R = 0;
+			plateau[ordJoyau3R][absJoyau3R] = "JRose";
+			int ordJoyau3V = 7;
+			int absJoyau3V = 3;
+			plateau[ordJoyau3V][absJoyau3V] = "JVert";
+			int ordJoyau3B = 7;
+			int absJoyau3B = 6;
+			plateau[ordJoyau3B][absJoyau3B] = "JBleu";
+
+		} 
+	public void setJoyauxPlateau4() {
+			int ordJoyau3R = 7;
+			int absJoyau3R = 1;
+			plateau[ordJoyau3R][absJoyau3R] = "JRose";
+			int ordJoyau3B = 7;
+			int absJoyau3B = 6;
+			plateau[ordJoyau3B][absJoyau3B] = "JBleu";
+		}
+	
+
+	public void setMursPierrePlateau() {
+		for (int k = 0; k < 8; k++) {
+			plateau[k][7] = "P";
+		}
+	}
+
+}
